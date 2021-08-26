@@ -509,12 +509,12 @@ namespace AutoClick
             luot++;
             #region Demo new code 21/08/2021
             string statusLastRound = resultStatus;
-            if (resultStatus == ResultStatus.Lose.ToString() && MaxBetCount == 0)
+            if (MaxBetCount == 0)
             {
-                resultStatus = ResultStatus.Win.ToString();
+                resultStatus = ResultStatus.Lose.ToString();
             }
 
-            if (resultStatus == ResultStatus.Lose.ToString())
+            if (resultStatus == ResultStatus.Win.ToString())
             {
                 MaxBetCount--;
                 BetLevel *= 2;
@@ -568,7 +568,7 @@ namespace AutoClick
                 }
                 #endregion
             }
-            else if (resultStatus == ResultStatus.Win.ToString())
+            else if (resultStatus == ResultStatus.Lose.ToString())
             {
                 MaxBetCount = InitBetCount;
                 BetLevel = StartBetLevel;
