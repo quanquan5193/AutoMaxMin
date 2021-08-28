@@ -85,20 +85,36 @@ namespace AutoClick
         }
 
         public int BetLevel { get; set; } = 1;
-        private int maxBetCount;
-        public int MaxBetCount
+        private int maxBetCount1;
+        public int MaxBetCount1
         {
-            get => maxBetCount;
+            get => maxBetCount1;
             set
             {
-                maxBetCount = value;
+                maxBetCount1 = value;
                 if (IsSettingApplication)
                 {
-                    InitBetCount = maxBetCount;
+                    InitBetCount1 = maxBetCount1;
                 }
                 OnPropertyChanged();
             }
         }
+
+        private int maxBetCount2;
+        public int MaxBetCount2
+        {
+            get => maxBetCount2;
+            set
+            {
+                maxBetCount2 = value;
+                if (IsSettingApplication)
+                {
+                    InitBetCount2 = maxBetCount2;
+                }
+                OnPropertyChanged();
+            }
+        }
+        public BetType InitBetType { get; set; }
         private BetType betType = BetType.Tai;
         public BetType BetType
         {
@@ -106,6 +122,10 @@ namespace AutoClick
             set
             {
                 betType = value;
+                if (IsSettingApplication)
+                {
+                    InitBetType = betType;
+                }
                 OnPropertyChanged();
             }
         }
@@ -349,7 +369,7 @@ namespace AutoClick
             var cuoc = ActionEntriesCollection.FirstOrDefault(x => x.ButtonType == ButtonType.Cuoc);
             if (cuoc == null) return;
 
-            if (InitBetCount == MaxBetCount)
+            if (InitBetCount2 == MaxBetCount2)
             {
                 BetLevel = StartBetLevel;
             }
@@ -358,7 +378,7 @@ namespace AutoClick
             dt.Interval = interval;
             dt.Tick += (_, a) =>
             {
-                if (CountDownTime-- == 0 )
+                if (CountDownTime-- == 0)
                 {
                     CountDownTime = 5;
                     if (IsTurnToNextRound)
@@ -388,7 +408,7 @@ namespace AutoClick
                         Log(w, 0);
                         w.WriteLine($"\r\nLog Entry : {DateTime.Now.ToLongTimeString()}");
                         w.WriteLine($"Result this game: Lượt đầu");
-                        w.WriteLine($"Bet countdown: {MaxBetCount}");
+                        w.WriteLine($"Bet countdown: {MaxBetCount1}");
                         w.WriteLine($"Bet level: {BetLevel}000");
                         w.WriteLine("-------------------------------");
                     }
@@ -399,7 +419,9 @@ namespace AutoClick
             }
         }
 
-        private int InitBetCount = 0;
+        private int InitBetCount1 = 0;
+
+        private int InitBetCount2 = 0;
 
         private string statusMinMaxLastRound;
 
@@ -470,7 +492,7 @@ namespace AutoClick
                 betMoney = json?.data[0]?._source?.game_stake;
             }
         }
-
+        public bool ChangeBetWay { get; set; } = false;
         private async Task AutoClick(ActionEntry tai, ActionEntry xiu, ActionEntry cuoc)
         {
             #region Get result last round
@@ -484,7 +506,7 @@ namespace AutoClick
 
             #endregion
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Log\Reportlog.txt";
-            if(idLastRound == 0)
+            if (idLastRound == 0)
             {
                 using (StreamWriter w = File.AppendText(path))
                 {
@@ -509,14 +531,24 @@ namespace AutoClick
             luot++;
             #region Demo new code 21/08/2021
             string statusLastRound = resultStatus;
-            if (resultStatus == ResultStatus.Lose.ToString() && MaxBetCount == 0)
+            if (resultStatus == ResultStatus.Lose.ToString() && MaxBetCount2 == 0)
             {
                 resultStatus = ResultStatus.Win.ToString();
             }
 
             if (resultStatus == ResultStatus.Lose.ToString())
             {
-                MaxBetCount--;
+                if (MaxBetCount1 > 0)
+                {
+                    MaxBetCount1--;
+                    ChangeBetWay = true;
+                }
+                if (ChangeBetWay)
+                {
+                    ChangeBetWay = false;
+                    BetType = BetType == BetType.Tai ? BetType.Xiu : BetType.Tai;
+                }
+                MaxBetCount2--;
                 BetLevel *= 2;
                 double commission = (double)BetLevel * 2 / 100;
                 if (commission >= StartBetLevel)
@@ -525,7 +557,7 @@ namespace AutoClick
                 }
 
                 string startTime = DateTime.Now.ToLongTimeString();
-                
+
                 #region Bet Then Check
                 await AcctionBet(tai, xiu, cuoc);
 
@@ -562,7 +594,7 @@ namespace AutoClick
                     w.WriteLine($"Kết quả ván trước : {statusLastRound}");
                     w.WriteLine($"Id ván này : {idThisRound}");
                     w.WriteLine($"Commission : {commission}");
-                    w.WriteLine($"Số lượt: {MaxBetCount}");
+                    w.WriteLine($"Số lượt: {MaxBetCount1}");
                     w.WriteLine($"Số tiền cược: {BetLevel}000");
                     w.WriteLine("-------------------------------");
                 }
@@ -570,10 +602,12 @@ namespace AutoClick
             }
             else if (resultStatus == ResultStatus.Win.ToString())
             {
-                MaxBetCount = InitBetCount;
+                BetType = InitBetType;
+                MaxBetCount1 = InitBetCount1;
+                MaxBetCount2 = InitBetCount2;
                 BetLevel = StartBetLevel;
                 string startTime = DateTime.Now.ToLongTimeString();
-                
+
                 #region Bet Then Check
                 await AcctionBet(tai, xiu, cuoc);
 
@@ -610,7 +644,7 @@ namespace AutoClick
                     w.WriteLine($"Kết quả ván trước : {statusLastRound}");
                     w.WriteLine($"Id ván này : {idThisRound}");
                     w.WriteLine($"Commission : default");
-                    w.WriteLine($"Số lượt: {MaxBetCount}");
+                    w.WriteLine($"Số lượt: {MaxBetCount1}");
                     w.WriteLine($"Số tiền cược: {BetLevel}000");
                     w.WriteLine("-------------------------------");
                 }
@@ -657,7 +691,7 @@ namespace AutoClick
                     w.WriteLine($"Kết quả ván trước : {statusLastRound}");
                     w.WriteLine($"Id ván này : {idThisRound}");
                     w.WriteLine($"Commission : ");
-                    w.WriteLine($"Số lượt: {MaxBetCount}");
+                    w.WriteLine($"Số lượt: {MaxBetCount1}");
                     w.WriteLine($"Số tiền cược: {BetLevel}000");
                     w.WriteLine("-------------------------------");
                 }
@@ -672,162 +706,15 @@ namespace AutoClick
                     w.WriteLine($"Kết quả ván trước : {statusLastRound}");
                     w.WriteLine($"Id ván này : {idThisRound}");
                     w.WriteLine($"Commission : null");
-                    w.WriteLine($"Số lượt: {MaxBetCount}");
+                    w.WriteLine($"Số lượt: {MaxBetCount1}");
                     w.WriteLine($"Số tiền cược: {BetLevel}000");
                     w.WriteLine("-------------------------------");
                 }
                 StopApplication();
-                
+
             }
 
             IsTurnToNextRound = true;
-            #endregion
-
-            #region Code cũ
-            //if (idLastRound == 0)
-            //{
-            //    using (StreamWriter w = File.AppendText(path))
-            //    {
-            //        Log(w, 1, idThisRound, statusMinMax);
-            //    }
-            //    idLastRound = idThisRound;
-            //    return;
-            //}
-
-            //if (idLastRound == idThisRound)
-            //{
-            //    if (resultStatus == ResultStatus.Running.ToString())
-            //    {
-            //        using (StreamWriter w = File.AppendText(path))
-            //        {
-            //            Log(w, 2, idThisRound, statusMinMax);
-            //        }
-            //        return;
-            //    }
-            //    else
-            //    {
-            //        using (StreamWriter w = File.AppendText(path))
-            //        {
-            //            Log(w, 3, idThisRound, statusMinMax);
-            //        }
-            //        await Task.Delay(13000);
-            //        ResultBet = resultStatus;
-            //        ThongKe(statusMinMax);
-
-            //        if (resultStatus == ResultStatus.Lose.ToString() && MaxBetCount == 0)
-            //        {
-            //            resultStatus = ResultStatus.Win.ToString();
-            //        }
-
-            //        if (resultStatus == ResultStatus.Lose.ToString())
-            //        {
-            //            MaxBetCount--;
-            //            BetLevel *= 2;
-            //            double commission = (double)BetLevel * 2 / 100;
-            //            if (commission >= StartBetLevel)
-            //            {
-            //                BetLevel += StartBetLevel;
-            //            }
-            //            using (StreamWriter w = File.AppendText(path))
-            //            {
-            //                w.WriteLine($"\r\nLog Entry : {DateTime.Now.ToLongTimeString()}");
-            //                w.WriteLine($"Commission : {commission}");
-            //                w.WriteLine($"Result this game: {resultStatus}");
-            //                w.WriteLine($"Bet countdown: {MaxBetCount}");
-            //                w.WriteLine($"Bet level: {BetLevel}");
-            //                w.WriteLine("-------------------------------");
-            //            }
-
-            //            if (BetType == BetType.Tai)
-            //            {
-            //                await FireClick(xiu);
-            //                await Task.Delay(200);
-            //                await FireClick(tai);
-            //                await Task.Delay(200);
-            //            }
-            //            else
-            //            {
-            //                await FireClick(tai);
-            //                await Task.Delay(200);
-            //                await FireClick(xiu);
-            //                await Task.Delay(200);
-            //            }
-            //            await CalculateBetMoney(sortedList);
-            //            InitMoneyPerRound = 0;
-            //            await FireClick(cuoc);
-            //        }
-            //        else if (resultStatus == ResultStatus.Win.ToString())
-            //        {
-            //            MaxBetCount = InitBetCount;
-            //            BetLevel = StartBetLevel;
-            //            using (StreamWriter w = File.AppendText(path))
-            //            {
-            //                w.WriteLine($"\r\nLog Entry : {DateTime.Now.ToLongTimeString()}");
-            //                w.WriteLine($"Commission : ");
-            //                w.WriteLine($"Result this game: {resultStatus}");
-            //                w.WriteLine($"Bet countdown: {MaxBetCount}");
-            //                w.WriteLine($"Bet level: {BetLevel}");
-            //                w.WriteLine("-------------------------------");
-            //            }
-            //            if (BetType == BetType.Tai)
-            //            {
-            //                await FireClick(xiu);
-            //                await Task.Delay(200);
-            //                await FireClick(tai);
-            //                await Task.Delay(200);
-            //            }
-            //            else
-            //            {
-
-            //                await FireClick(tai);
-            //                await Task.Delay(200);
-            //                await FireClick(xiu);
-            //                await Task.Delay(200);
-            //            }
-            //            await CalculateBetMoney(sortedList);
-            //            InitMoneyPerRound = 0;
-            //            await FireClick(cuoc);
-            //        }
-            //        else if (resultStatus == ResultStatus.Draw.ToString())
-            //        {
-            //            using (StreamWriter w = File.AppendText(path))
-            //            {
-            //                w.WriteLine($"\r\nLog Entry : {DateTime.Now.ToLongTimeString()}");
-            //                w.WriteLine($"Commission : ");
-            //                w.WriteLine($"Result this game: {resultStatus}");
-            //                w.WriteLine($"Bet countdown: {MaxBetCount}");
-            //                w.WriteLine($"Bet level: {BetLevel}");
-            //                w.WriteLine("-------------------------------");
-            //            }
-            //            if (BetType == BetType.Tai)
-            //            {
-            //                await FireClick(tai);
-            //                Thread.Sleep(200);
-            //            }
-            //            else
-            //            {
-            //                await FireClick(xiu);
-            //                Thread.Sleep(200);
-            //            }
-            //            await CalculateBetMoney(sortedList);
-            //            InitMoneyPerRound = 0;
-            //            await FireClick(cuoc);
-            //        }
-            //        else
-            //        {
-            //            StopApplication();
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    using (StreamWriter w = File.AppendText(path))
-            //    {
-            //        Log(w, 4, idThisRound, statusMinMax);
-            //    }
-            //    idLastRound = idThisRound;
-            //    return;
-            //}
             #endregion
         }
 
@@ -1058,7 +945,7 @@ namespace AutoClick
                     CommandAction = x =>
                     {
                         BetLevel = StartBetLevel;
-                        MaxBetCount = InitBetCount;
+                        MaxBetCount1 = InitBetCount1;
                     }
                 };
             }

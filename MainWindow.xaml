@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         x:Name="HandleAutoClick"
         
-        Title="AutoClick" Height="700" Width="500" ResizeMode="NoResize">
+        Title="AutoClick" Height="730" Width="500" ResizeMode="NoResize">
     <Window.InputBindings>
         <KeyBinding Key="Q" Modifiers="Alt" Command="{Binding AddTaiPosition}"/>
         <KeyBinding Key="W" Modifiers="Alt" Command="{Binding AddXiuPosition}"/>
@@ -33,7 +33,7 @@
                     <RowDefinition ></RowDefinition>
                     <RowDefinition ></RowDefinition>
                     <RowDefinition ></RowDefinition>
-                    <RowDefinition Height="2*"></RowDefinition>
+                    <RowDefinition Height="3*"></RowDefinition>
                     <RowDefinition ></RowDefinition>
                     <RowDefinition ></RowDefinition>
                     <RowDefinition ></RowDefinition>
@@ -69,6 +69,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <TextBox
                       materialDesign:HintAssist.Hint="Mức x1000"
@@ -79,12 +80,21 @@
                       Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                       FontSize="20" />
                     <TextBox Grid.Row="1"
-                      materialDesign:HintAssist.Hint="Số lần cược"
+                      materialDesign:HintAssist.Hint="Số lần cược 1"
                       materialDesign:TextFieldAssist.TextBoxViewMargin="1 0 1 0"
                       materialDesign:HintAssist.FloatingScale="0.50"
                       PreviewTextInput ="TextBox_PreviewTextInput" 
                       IsEnabled="{Binding IsSettingApplication}"
-                      Text="{Binding MaxBetCount, UpdateSourceTrigger=PropertyChanged }"
+                      Text="{Binding MaxBetCount1, UpdateSourceTrigger=PropertyChanged }"
+                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                      FontSize="20" />
+                    <TextBox Grid.Row="2"
+                      materialDesign:HintAssist.Hint="Số lần cược 2"
+                      materialDesign:TextFieldAssist.TextBoxViewMargin="1 0 1 0"
+                      materialDesign:HintAssist.FloatingScale="0.50"
+                      PreviewTextInput ="TextBox_PreviewTextInput" 
+                      IsEnabled="{Binding IsSettingApplication}"
+                      Text="{Binding MaxBetCount2, UpdateSourceTrigger=PropertyChanged }"
                       Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                       FontSize="20" />
                 </Grid>
