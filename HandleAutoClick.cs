@@ -518,6 +518,8 @@ namespace AutoClick
             }
             if (idLastRound == idThisRound && resultStatus == ResultStatus.Running.ToString())
             {
+
+
                 //Ghi log ở đây sau
                 using (StreamWriter w = File.AppendText(path))
                 {
@@ -529,6 +531,9 @@ namespace AutoClick
             IsTurnToNextRound = false;
 
             luot++;
+
+            //Ghi thống kê
+            ThongKe(statusMinMax);
             #region Demo new code 21/08/2021
             string statusLastRound = resultStatus;
             if (resultStatus == ResultStatus.Lose.ToString() && MaxBetCount2 == 0)
@@ -541,7 +546,7 @@ namespace AutoClick
                 if (MaxBetCount1 > 0)
                 {
                     MaxBetCount1--;
-                    ChangeBetWay = true;
+                    ChangeBetWay = MaxBetCount1 == 0 ?  true : false;
                 }
                 if (ChangeBetWay)
                 {
@@ -858,7 +863,7 @@ namespace AutoClick
 
         private void ThongKe(string statusMinMax)
         {
-            if (statusMinMax == statusMinMaxLastRound)
+            if (statusMinMax == statusMinMaxLastRound || string.IsNullOrEmpty(statusMinMaxLastRound))
             {
                 increase++;
             }
