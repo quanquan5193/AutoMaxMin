@@ -507,6 +507,9 @@ namespace AutoClick
             IsTurnToNextRound = false;
 
             luot++;
+
+            //Thống kê
+            ThongKe(statusMinMax);
             #region Demo new code 21/08/2021
             string statusLastRound = resultStatus;
             if (MaxBetCount == 0)
@@ -814,6 +817,8 @@ namespace AutoClick
 
         private int increase = 1;
         private int soLan2 = 0;
+        private int soLan3 = 0;
+        private int soLan4 = 0;
         private int soLan5 = 0;
         private int soLan6 = 0;
         private int soLan7 = 0;
@@ -836,6 +841,12 @@ namespace AutoClick
             {
                 case 2:
                     soLan2++;
+                    break;
+                case 3:
+                    soLan3++;
+                    break;
+                case 4:
+                    soLan4++;
                     break;
                 case 5:
                     soLan5++;
@@ -868,8 +879,10 @@ namespace AutoClick
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
-            string Msg = "5 times: " + soLan5 + Environment.NewLine
-                       + "2 times: " + soLan2 + Environment.NewLine
+            string Msg = "2 times: " + soLan2 + Environment.NewLine
+                       + "3 times: " + soLan3 + Environment.NewLine
+                       + "4 times: " + soLan4 + Environment.NewLine
+                       + "5 times: " + soLan5 + Environment.NewLine
                        + "6 times: " + soLan6 + Environment.NewLine
                        + "7 times: " + soLan7 + Environment.NewLine
                        + "8 times: " + soLan8 + Environment.NewLine
